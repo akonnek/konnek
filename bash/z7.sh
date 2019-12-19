@@ -1,23 +1,22 @@
 #!/bin/bash
 
-#pętla until
+#funkcje, podprogramy
 
-i=10
-until [ ${i} -eq 10 }; do
-    echo ${i}
-i=$[i+1]
-done
+#procedura
+function Moja () {
+    echo "Procedura"
+}
 
+#wywołanie procedury
 
-#pętla select
-echo " Podaj opcję:"
+Moja
 
-select opcja in File Edit Quit
-do
-    case ${opcja} in
-	"File") echo "Wybrano opcjE ${opcja}" ;;
-	"File") echo "Wybrano opcjE ${opcja}" ;;
-	"Quit") exit ;;
-	*) echo "Error" ;;
-    esac
+#Zad1 wywołaj procedurę 10 razy metodą iteracyjną (while)
+
+Moja
+
+x=1
+while [ $x -le 10 ]; do
+    Moja
+x=$[x + 1]
 done
