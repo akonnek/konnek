@@ -4,6 +4,18 @@
 #zmienna globalna
 #ładowanie danych z pliku
 user_list=(`cat users.txt`)
+status="[FAIL]"
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\e[0m'
+
+function checkStatusCode() {
+    if [ $? == 0 ]; then
+	status="${GREEN}[PASS]${NC}"
+    else
+	status="${RED}[FAIL]${NC}"
+    fi
+}
 
 function showUsers() {
     echo "showUsers ..."
@@ -18,10 +30,12 @@ function addUsers() {
     echo -n "Are you sure? [y/n]"
     read sure
     if [ "${sure}" == "y" ]; then
-	for user in "${user_list[@] }"
+	for user in "${user_list[@]}"
 	do
-	    echo "Add user: ${user}[OK]"
-	    sudo useradd ${user} -s /sbin/nologin -g "users"
+	    sudo useradd ${user} -m -s /sbin/nologin -g "users" 2> /dev/null
+	    checkStatusCode
+	    #echo -e "Add user: ${user} $[{status}]"
+	    printf "Add user %10b %20b\n" "${user}"  "${status}"
 	done
     fi
 }
@@ -32,27 +46,33 @@ function delUsers() {
     if [ ${sure} == "y" ]; then
 	for user in "${user_list[@]}"
 	do
-	    echo "Remove user ${user} [OK]"
-	    sudo userdel ${user}
+	    sudo userdel -r ${user} 2> /dev/null
+	    checkStatusCode
+	    #echo -e "Remove user ${user} $[{status}]
+	    printf "Remove user %10b %20b\n" "${user}" "${status}"
 	done
     fi
 }
 function acceptRemoteLogin() {
     echo "acceptRemoteLogin ..."
-    for user in "${user_list[@] }"
-    do
-        echo "Accept remote login for ${user} [OK]"
-        sudo usermod -s /bin/bash ${user}
-    done
+	for user in "${user_list[@] }"
+	do
+	    sudo usermod -s /bin/bash ${user} 2> /dev/null
+	    checkStatusCode
+	    #echo -e "Accept remote login for ${user} [${status}]"
+	    printf "Accept remote login for %10b %20b\n" "${user}" "${status}"
+	done
 }
 
 function deniedRemoteLogin() {
     echo "deniedRemoteLogin ..."
-    for user in "${user_list[@] }"
-    do
-        echo "Denied remote login for ${user} [OK]"
-        sudo usermod -s /sbin/nologin ${user}
-    done
+	for user in "${user_list[@] }"
+	do
+	    sudo usermod -s /sbin/nologin ${user} 2> /dev/null
+	    checkStatusCode
+	    #echo -e "Denied remote login for ${user} [${status}]"
+	    printf "Denied remote login for %10b %20b\n" "${user}" "${status}"
+	done
 }
 function quit () {
     exit 0
